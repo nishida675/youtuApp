@@ -1,5 +1,4 @@
 import streamlit as st
-from pytube import YouTube
 import os
 
 from YoutubeDL import youtubeDL  # 別ファイルからクラスをインポート
