@@ -42,7 +42,7 @@ if st.session_state['yt_info']:
 
 # 保存先が選択されている場合にダウンロードボタンを表示
 if st.session_state['yt_info'] and st.session_state['download_option']:
-    if st.button("ダウンロード"):
+    if st.button("ダウンロードリンク発行"):
         yt = st.session_state['yt_info']['yt_object']
         
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4" if st.session_state['download_option'] == "動画" else ".mp3") as tmp_file:
@@ -51,13 +51,13 @@ if st.session_state['yt_info'] and st.session_state['download_option']:
                 video_stream = yt.streams.filter(file_extension='mp4').first()
                 tmp_file_path = video_stream.download(output_path=os.path.dirname(tmp_file.name), filename=os.path.basename(tmp_file.name))
                 st.session_state['download_path'] = tmp_file_path
-                st.success("動画のダウンロードが完了しました。")
+                st.success("動画のダウンロードリンクを発行しました。")
             elif st.session_state['download_option'] == "オーディオ":
                 # 最初のオーディオストリームをダウンロード
                 audio_stream = yt.streams.filter(only_audio=True).first()
                 tmp_file_path = audio_stream.download(output_path=os.path.dirname(tmp_file.name), filename=os.path.basename(tmp_file.name))
                 st.session_state['download_path'] = tmp_file_path
-                st.success("オーディオのダウンロードが完了しました。")
+                st.success("オーディオのダウンロードリンクを発行しました。")
         
         # ダウンロードリンクを提供
         with open(st.session_state['download_path'], 'rb') as file:
