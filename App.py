@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-
+import tempfile
 from YoutubeDL import youtubeDL  # 別ファイルからクラスをインポート
 
 st.title('Youtube ダウンロード')
@@ -40,29 +40,30 @@ if st.session_state['yt_info']:
         ("動画", "オーディオ")
     )
 
-# ユーザーのダウンロードフォルダのパスを取得
-if os.name == 'nt':  # Windowsの場合
-    default_download_path = os.path.join(os.environ['USERPROFILE'], 'Downloads')
-else:  # MacやLinuxの場合
-    default_download_path = os.path.join(os.path.expanduser('~'), 'Downloads')
-
-st.session_state['download_path'] = default_download_path
-
 # 保存先が選択されている場合にダウンロードボタンを表示
 if st.session_state['yt_info'] and st.session_state['download_option']:
     if st.button("ダウンロード"):
         yt = st.session_state['yt_info']['yt_object']
-        download_path = st.session_state['download_path']
-        if st.session_state['download_option'] == "動画":
-            # 最初の動画ストリームをダウンロード
-            video_stream = yt.streams.filter(file_extension='mp4').first()
-            download_path = video_stream.download(output_path=st.session_state['download_path'])
-            st.session_state['download_path'] = download_path
-            st.success("動画のダウンロードが完了しました。")
-        elif st.session_state['download_option'] == "オーディオ":
-            # 最初のオーディオストリームをダウンロード
-            audio_stream = yt.streams.filter(only_audio=True).first()
-            download_path = audio_stream.download(output_path=st.session_state['download_path'])
-            st.session_state['download_path'] = download_path
-            st.success("オーディオのダウンロードが完了しました。")
-
+        
+        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+            if st.session_state['download_option'] == "動画":
+                # 最初の動画ストリームをダウンロード
+                video_stream = yt.streams.filter(file_extension='mp4').first()
+                tmp_file_path = video_stream.download(output_path=os.path.dirname(tmp_file.name), filename=os.path.basename(tmp_file.name))
+                st.session_state['download_path'] = tmp_file_path
+                st.success("動画のダウンロードが完了しました。")
+            elif st.session_state['download_option'] == "オーディオ":
+                # 最初のオーディオストリームをダウンロード
+                audio_stream = yt.streams.filter(only_audio=True).first()
+                tmp_file_path = audio_stream.download(output_path=os.path.dirname(tmp_file.name), filename=os.path.basename(tmp_file.name))
+                st.session_state['download_path'] = tmp_file_path
+                st.success("オーディオのダウンロードが完了しました。")
+        
+        # ダウンロードリンクを提供
+        with open(st.session_state['download_path'], 'rb') as file:
+            st.download_button(
+                label="ファイルをダウンロード",
+                data=file,
+                file_name=os.path.basename(st.session_state['download_path']),
+                mime='application/octet-stream'
+            )
