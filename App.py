@@ -45,7 +45,7 @@ if st.session_state['yt_info'] and st.session_state['download_option']:
     if st.button("ダウンロード"):
         yt = st.session_state['yt_info']['yt_object']
         
-        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4" if st.session_state['download_option'] == "動画" else ".mp3") as tmp_file:
             if st.session_state['download_option'] == "動画":
                 # 最初の動画ストリームをダウンロード
                 video_stream = yt.streams.filter(file_extension='mp4').first()
@@ -61,9 +61,16 @@ if st.session_state['yt_info'] and st.session_state['download_option']:
         
         # ダウンロードリンクを提供
         with open(st.session_state['download_path'], 'rb') as file:
+            if st.session_state['download_option'] == "動画":
+                mime_type = 'video/mp4'
+                file_extension = '.mp4'
+            else:
+                mime_type = 'audio/mpeg'
+                file_extension = '.mp3'
+            
             st.download_button(
                 label="ファイルをダウンロード",
                 data=file,
-                file_name=os.path.basename(st.session_state['download_path']),
-                mime='application/octet-stream'
+                file_name=f"download{file_extension}",
+                mime=mime_type
             )
