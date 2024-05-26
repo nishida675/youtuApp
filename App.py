@@ -3,6 +3,11 @@ import os
 import tempfile
 from YoutubeDL import youtubeDL  # 別ファイルからクラスをインポート
 from pytube import exceptions
+import logging
+
+# ログの設定
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 st.title('Youtube ダウンロード')
 
@@ -78,3 +83,10 @@ if st.session_state['yt_info'] and st.session_state['download_option']:
                     )
             except exceptions.PytubeError as e:
                 st.error(f"エラーが発生しました: {e}")
+                logger.error(f"PytubeError: {e}")
+            except urllib.error.HTTPError as e:
+                st.error(f"HTTPエラーが発生しました: {e}")
+                logger.error(f"HTTPError: {e}")
+            except Exception as e:
+                st.error(f"予期しないエラーが発生しました: {e}")
+                logger.error(f"Unexpected error: {e}")
