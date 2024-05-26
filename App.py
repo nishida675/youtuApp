@@ -45,7 +45,7 @@ if st.session_state['yt_info'] and st.session_state['download_option']:
     if st.button("ダウンロードリンク発行"):
         yt = st.session_state['yt_info']['yt_object']
         
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4" if st.session_state['download_option'] == "動画" else ".mp3") as tmp_file:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4" if st.session_state['download_option'] == "動画" else ".mp3", dir='/tmp') as tmp_file:
             if st.session_state['download_option'] == "動画":
                 # 最初の動画ストリームをダウンロード
                 video_stream = yt.streams.filter(file_extension='mp4').first()
