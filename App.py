@@ -1,11 +1,10 @@
 import streamlit as st
 import os
 import tempfile
-
-import urllib3
 from YoutubeDL import youtubeDL  # 別ファイルからクラスをインポート
 from pytube import exceptions
 import logging
+import urllib.error
 
 # ログの設定
 logging.basicConfig(level=logging.DEBUG)
@@ -57,7 +56,7 @@ if st.session_state['yt_info'] and st.session_state['download_option']:
             try:
                 if st.session_state['download_option'] == "動画":
                     # 最初の動画ストリームをダウンロード
-                    video_stream = yt.streams.filter(file_extension='mp4').first()
+                    video_stream = yt.streams.filter(file_extension='mp4', progressive=True).first()
                     tmp_file_path = video_stream.download(output_path=os.path.dirname(tmp_file.name), filename=os.path.basename(tmp_file.name))
                     st.session_state['download_path'] = tmp_file_path
                     st.success("動画のダウンロードリンクを発行しました。")
@@ -86,7 +85,7 @@ if st.session_state['yt_info'] and st.session_state['download_option']:
             except exceptions.PytubeError as e:
                 st.error(f"エラーが発生しました: {e}")
                 logger.error(f"PytubeError: {e}")
-            except urllib3.error.HTTPError as e:
+            except urllib.error.HTTPError as e:
                 st.error(f"HTTPエラーが発生しました: {e}")
                 logger.error(f"HTTPError: {e}")
             except Exception as e:
