@@ -1,6 +1,8 @@
 import streamlit as st
 import os
 import tempfile
+
+import urllib3
 from YoutubeDL import youtubeDL  # 別ファイルからクラスをインポート
 from pytube import exceptions
 import logging
@@ -84,7 +86,7 @@ if st.session_state['yt_info'] and st.session_state['download_option']:
             except exceptions.PytubeError as e:
                 st.error(f"エラーが発生しました: {e}")
                 logger.error(f"PytubeError: {e}")
-            except urllib.error.HTTPError as e:
+            except urllib3.error.HTTPError as e:
                 st.error(f"HTTPエラーが発生しました: {e}")
                 logger.error(f"HTTPError: {e}")
             except Exception as e:
